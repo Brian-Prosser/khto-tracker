@@ -152,7 +152,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:10p
         <hr class="divider" />
         <div class="legend">
           <div class="legend-title">Ramp Types</div>
-          <div class="legend-item"><div class="legend-dot" style="background:#ff6b35"></div>Jet Main (J1–J10)</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#ff6b35"></div>Jet Main (J01–J10)</div>
           <div class="legend-item"><div class="legend-dot" style="background:#7be83e"></div>Turbo Prop (A–F)</div>
           <div class="legend-item"><div class="legend-dot" style="background:#4db8ff"></div>Helicopter (H1–H7)</div>
           <div class="legend-item"><div class="legend-dot" style="background:#c084fc"></div>Piston Tie Down (T1–T8)</div>
@@ -185,15 +185,15 @@ header{display:flex;align-items:center;justify-content:space-between;padding:10p
 <script src="config.js?v=20260409"></script>
 <script>
 var RAMP_DB = {
-  "J1":{"lat":40.96075,"lng":-72.24842,"color":"#ff6b35","short":"J1"},
-  "J2":{"lat":40.96053,"lng":-72.24892,"color":"#ff6b35","short":"J2"},
-  "J3":{"lat":40.96119,"lng":-72.24872,"color":"#ff6b35","short":"J3"},
-  "J4":{"lat":40.96108,"lng":-72.24894,"color":"#ff6b35","short":"J4"},
-  "J5":{"lat":40.96097,"lng":-72.24917,"color":"#ff6b35","short":"J5"},
-  "J6":{"lat":40.96086,"lng":-72.24942,"color":"#ff6b35","short":"J6"},
-  "J7":{"lat":40.96153,"lng":-72.24906,"color":"#ff6b35","short":"J7"},
-  "J8":{"lat":40.96142,"lng":-72.24928,"color":"#ff6b35","short":"J8"},
-  "J9":{"lat":40.96133,"lng":-72.2495,"color":"#ff6b35","short":"J9"},
+  "J01":{"lat":40.96075,"lng":-72.24842,"color":"#ff6b35","short":"J01"},
+  "J02":{"lat":40.96053,"lng":-72.24892,"color":"#ff6b35","short":"J02"},
+  "J03":{"lat":40.96119,"lng":-72.24872,"color":"#ff6b35","short":"J03"},
+  "J04":{"lat":40.96108,"lng":-72.24894,"color":"#ff6b35","short":"J04"},
+  "J05":{"lat":40.96097,"lng":-72.24917,"color":"#ff6b35","short":"J05"},
+  "J06":{"lat":40.96086,"lng":-72.24942,"color":"#ff6b35","short":"J06"},
+  "J07":{"lat":40.96153,"lng":-72.24906,"color":"#ff6b35","short":"J07"},
+  "J08":{"lat":40.96142,"lng":-72.24928,"color":"#ff6b35","short":"J08"},
+  "J09":{"lat":40.96133,"lng":-72.2495,"color":"#ff6b35","short":"J09"},
   "J10":{"lat":40.96122,"lng":-72.24975,"color":"#ff6b35","short":"J10"},
   "A":{"lat":40.96080,"lng":-72.24880,"color":"#7be83e","short":"A"},
   "B":{"lat":40.96060,"lng":-72.24870,"color":"#7be83e","short":"B"},
@@ -237,15 +237,15 @@ var RAMP_DB = {
 
 // All known Trello label name variants mapped to DB keys
 var LABEL_MAP = {
-  "JET MAIN J1":"J1","JET MAIN JI":"J1","JET MAIN RAMP J1":"J1","JET MAIN RAMP JI":"J1",
-  "JET MAIN J2":"J2","JET MAIN RAMP J2":"J2",
-  "JET MAIN J3":"J3","JET MAIN RAMP J3":"J3",
-  "JET MAIN J4":"J4","JET MAIN RAMP J4":"J4",
-  "JET MAIN J5":"J5","JET MAIN RAMP J5":"J5",
-  "JET MAIN J6":"J6","JET MAIN RAMP J6":"J6",
-  "JET MAIN J7":"J7","JET MAIN RAMP J7":"J7",
-  "JET MAIN J8":"J8","JET MAIN RAMP J8":"J8",
-  "JET MAIN J9":"J9","JET MAIN RAMP J9":"J9",
+  "JET MAIN J01":"J01","JET MAIN JI":"J01","JET MAIN RAMP J01":"J01","JET MAIN RAMP JI":"J01",
+  "JET MAIN J02":"J02","JET MAIN RAMP J02":"J02",
+  "JET MAIN J03":"J03","JET MAIN RAMP J03":"J03",
+  "JET MAIN J04":"J04","JET MAIN RAMP J04":"J04",
+  "JET MAIN J05":"J05","JET MAIN RAMP J05":"J05",
+  "JET MAIN J06":"J06","JET MAIN RAMP J06":"J06",
+  "JET MAIN J07":"J07","JET MAIN RAMP J07":"J07",
+  "JET MAIN J08":"J08","JET MAIN RAMP J08":"J08",
+  "JET MAIN J09":"J09","JET MAIN RAMP J09":"J09",
   "JET MAIN J10":"J10","JET MAIN RAMP J10":"J10",
   "TURBO PROP A":"A","TURBO PROP MAIN RAMP A":"A","TURBO PROP MAIN A":"A",
   "TURBO PROP B":"B","TURBO PROP MAIN RAMP B":"B","TURBO PROP MAIN B":"B",

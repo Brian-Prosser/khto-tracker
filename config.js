@@ -13,13 +13,13 @@ const CONFIG = {
   // ── TRELLO ──────────────────────────────────────────────────
   trello: {
     apiKey: '91d4799692a37d718fe3af5ee4aaafad',  // TEST key
-    token:  'REPLACE_WITH_TOKEN',                 // Trello auth token
+    token:  'ATTAca701dc2e23580dbb573159810bcea51569347c4394302fa28d605ed8382d65aDD88FB75',                 // Trello auth token
     boardName: 'SAS Ramp Tracker',               // Auto-selects this board
   },
 
   // ── MAPBOX ──────────────────────────────────────────────────
   mapbox: {
-    token: 'REPLACE_WITH_MAPBOX_TOKEN',          // pk.eyJ1...
+    token: 'pk.eyJ1IjoiYnJpYW5wcm9zc2VyIiwiYSI6ImNsdGNxNTFmcjI1cmwyanBkOW95eGxkeXMifQ.bb0AkKn41NMbMQ8cNUiFAg',          // pk.eyJ1...
     style: 'mapbox://styles/mapbox/satellite-streets-v12',
     center: [-72.2508, 40.9603],                 // KJPX default center
     zoom: 16.2,                                  // Default zoom level

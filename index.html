@@ -155,7 +155,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:10p
 var RAMP_DB = {
   "J1":{"lat":40.96075,"lng":-72.24842,"color":"#ff6b35","short":"J1"},
   "J2":{"lat":40.96053,"lng":-72.24892,"color":"#ff6b35","short":"J2"},
-  "J3":{"lat":40.96090,"lng":-72.24910,"color":"#ff6b35","short":"J3"},
+  "J3":{"lat":40.96119,"lng":-72.24872,"color":"#ff6b35","short":"J3"},
   "J4":{"lat":40.96065,"lng":-72.24910,"color":"#ff6b35","short":"J4"},
   "J5":{"lat":40.96040,"lng":-72.24910,"color":"#ff6b35","short":"J5"},
   "J6":{"lat":40.96015,"lng":-72.24910,"color":"#ff6b35","short":"J6"},
@@ -431,9 +431,11 @@ function formatDue(due) {
   if (!due) return { label: 'No due date', cls: '' };
   var d = new Date(due);
   var diff = (d - new Date()) / 86400000;
-  var label = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  var dateLabel = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  var timeLabel = d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+  var label = dateLabel + ' · ' + timeLabel;
   if (diff < 0) return { label: '⚠ ' + label, cls: 'overdue' };
-  if (diff < 1) return { label: '🔴 TODAY', cls: 'today' };
+  if (diff < 1) return { label: '🔴 TODAY · ' + timeLabel, cls: 'today' };
   return { label: label, cls: '' };
 }
 

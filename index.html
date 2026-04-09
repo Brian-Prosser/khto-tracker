@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>KHTO Ramp Tracker</title>
+<link href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet" />
+<script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;600&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0b0e14;
+    --panel: #131720;
+    --border: #1e2535;
+    --accent: #00d9ff;
+    --accent2: #ff6b35;
+    --text: #e8edf5;
+    --muted: #5a6480;
+    --jet: #ff6b35;
+    --turbo: #7be83e;
+    --heli: #4db8ff;
+    --piston-td: #c084fc;
+    --piston-tr: #a855f7;
+    --hold: #ef4444;
+    --other: #94a3b8;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 20px;
+    background: var(--panel);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+    gap: 12px;
+  }
+  .header-left { display: flex; align-items: center; gap: 14px; }
+  .logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 3px;
+    color: var(--accent);
+    line-height: 1;
+  }
+  .logo span { color: var(--accent2); }
+  .subtitle {
+    font-size: 11px;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 1px;
+  }
+  .header-right { display: flex; align-items: center; gap: 10px; }
+  .status-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--muted);
+  }
+  .status-dot.live { background: #22c55e; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+  .status-text { font-size: 11px; color: var(--muted); font-family: 'DM Mono', monospace; }
+
+  .main { display: flex; flex: 1; overflow: hidden; }
+
+  .sidebar {
+    width: 300px;
+    background: var(--panel);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .sidebar-tabs { display: flex; border-bottom: 1px solid var(--border); }
+  .tab-btn {
+    flex: 1;
+    padding: 10px;
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1px;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all .2s;
+    text-transform: uppercase;
+  }
+  .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  .tab-content { display: none; flex-direction: column; flex: 1; overflow: hidden; }
+  .tab-content.active { display: flex; }
+
+  .settings-scroll { padding: 16px; overflow-y: auto; flex: 1; }
+  .field-group { margin-bottom: 16px; }
+  .field-label {
+    font-size: 10px;
+    font-family: 'DM Mono', monospace;
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .field-input {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 10px;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    outline: none;
+    transition: border-color .2s;
+  }
+  .field-input:focus { border-color: var(--accent); }
+  .field-input::placeholder { color: var(--muted); }
+
+  .field-select {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 10px;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    outline: none;
+    cursor: pointer;
+  }
+  .field-select:focus { border-color: var(--accent); }
+
+  .btn-primary {
+    width: 100%;
+    padding: 10px;
+    background: var(--accent);
+    color: #000;
+    border: none;
+    border-radius: 6px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 16px;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: opacity .2s, transform .1s;
+  }
+  .btn-primary:hover { opacity: .85; }
+  .btn-primary:active { transform: scale(.98); }
+  .btn-primary:disabled { opacity: .4; cursor: not-allowed; }
+
+  .divider { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+
+  .legend { padding: 12px 16px; }
+  .legend-title {
+    font-size: 10px;
+    font-family: 'DM Mono', monospace;
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .legend-item { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; font-size: 12px; color: var(--text); }
+  .legend-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+
+  .aircraft-header {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .aircraft-count { font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: var(--accent); line-height: 1; }
+  .aircraft-label { font-size: 11px; color: var(--muted); }
+  .aircraft-list { overflow-y: auto; flex: 1; }
+  .aircraft-item {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: background .15s;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .aircraft-item:hover { background: rgba(0,217,255,.05); }
+  .aircraft-item.selected { background: rgba(0,217,255,.08); border-left: 2px solid var(--accent); }
+  .aircraft-ramp-badge {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 13px;
+    color: #000;
+    flex-shrink: 0;
+    font-weight: 700;
+  }
+  .aircraft-info { flex: 1; min-width: 0; }
+  .aircraft-tail {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .aircraft-due { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .aircraft-due.overdue { color: #ef4444; }
+  .aircraft-due.today { color: #f59e0b; }
+
+  .empty-state {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: var(--muted);
+    padding: 40px 20px;
+    text-align: center;
+  }
+  .empty-icon { font-size: 32px; opacity: .4; }
+  .empty-title { font-size: 13px; font-family: 'DM Mono', monospace; }
+  .empty-sub { font-size: 11px; line-height: 1.5; }
+
+  #map { flex: 1; }
+
+  .toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    color: #fff;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-family: 'DM Mono', monospace;
+    z-index: 1000;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all .3s;
+    max-width: 300px;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+
+  .mapboxgl-popup-content {
+    background: #131720 !important;
+    border: 1px solid #1e2535 !important;
+    border-radius: 10px !important;
+    padding: 12px 14px !important;
+    color: #e8edf5 !important;
+    font-family: 'DM Sans', sans-serif !important;
+    box-shadow: 0 8px 32px rgba(0,0,0,.5) !important;
+    min-width: 160px;
+  }
+  .mapboxgl-popup-tip { display: none !important; }
+  .popup-tail { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 2px; color: #00d9ff; line-height: 1; }
+  .popup-ramp { font-family: 'DM Mono', monospace; font-size: 11px; color: #5a6480; margin-top: 2px; }
+  .popup-due { font-size: 12px; margin-top: 8px; padding-top: 8px; border-top: 1px solid #1e2535; color: #e8edf5; }
+  .popup-due-label { color: #5a6480; font-size: 10px; font-family: 'DM Mono', monospace; text-transform: uppercase; letter-spacing: 1px; }
+
+  .info-box {
+    background: rgba(0,217,255,.06);
+    border: 1px solid rgba(0,217,255,.2);
+    border-radius: 6px;
+    padding: 10px 12px;
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.6;
+    margin-bottom: 12px;
+  }
+  .info-box a { color: var(--accent); text-decoration: none; }
+  .info-box a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <div>
+      <div class="logo">KHTO <span>RAMP</span> TRACKER</div>
+      <div class="subtitle">EAST HAMPTON AIRPORT · LIVE POSITIONS</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="status-dot" id="statusDot"></div>
+    <div class="status-text" id="statusText">NOT CONNECTED</div>
+  </div>
+</header>
+
+<div class="main">
+  <div class="sidebar">
+    <div class="sidebar-tabs">
+      <button class="tab-btn active" onclick="switchTab('settings')">⚙ Settings</button>
+      <button class="tab-btn" onclick="switchTab('aircraft')">✈ Aircraft</button>
+    </div>
+
+    <!-- SETTINGS TAB -->
+    <div class="tab-content active" id="tab-settings">
+      <div class="settings-scroll">
+        <div class="info-box">
+          Enter your API keys below. Keys are saved locally in your browser so you don't need to re-enter them.<br><br>
+          Need keys? <a href="https://trello.com/app-key" target="_blank">Get Trello API key →</a>
+        </div>
+
+        <div class="field-group">
+          <div class="field-label">Trello API Key</div>
+          <input class="field-input" type="text" id="trelloKey" placeholder="your-trello-api-key" />
+        </div>
+        <div class="field-group">
+          <div class="field-label">Trello Token</div>
+          <input class="field-input" type="password" id="trelloToken" placeholder="your-trello-token" />
+        </div>
+        <div class="field-group">
+          <div class="field-label">Mapbox Access Token</div>
+          <input class="field-input" type="password" id="mapboxToken" placeholder="pk.eyJ1Ijoi..." />
+        </div>
+
+        <button class="btn-primary" id="connectBtn" onclick="connectTrello()">CONNECT TO TRELLO</button>
+
+        <hr class="divider" />
+
+        <div id="boardSection" style="display:none">
+          <div class="field-group">
+            <div class="field-label">Select Board</div>
+            <select class="field-select" id="boardSelect"></select>
+          </div>
+          <div class="field-group">
+            <div class="field-label">Ramp Position Field Name</div>
+            <input class="field-input" type="text" id="rampFieldName" placeholder="e.g. Ramp Position" value="Ramp Position" />
+          </div>
+          <div class="field-group">
+            <div class="field-label">Auto-refresh (seconds, 0 = off)</div>
+            <input class="field-input" type="number" id="refreshInterval" value="30" min="0" />
+          </div>
+          <button class="btn-primary" style="background:var(--accent2)" id="loadBtn" onclick="loadCards()">LOAD AIRCRAFT</button>
+        </div>
+
+        <hr class="divider" />
+
+        <div class="legend">
+          <div class="legend-title">Ramp Types</div>
+          <div class="legend-item"><div class="legend-dot" style="background:var(--jet)"></div>Jet Main (J1–J10)</div>
+          <div class="legend-item"><div class="legend-dot" style="background:var(--turbo)"></div>Turbo Prop (A–F)</div>
+          <div class="legend-item"><div class="legend-dot" style="background:var(--heli)"></div>Helicopter (H1–H7)</div>
+          <div class="legend-item"><div class="legend-dot" style="background:var(--piston-td)"></div>Piston Tie Down (T1–T8)</div>
+          <div class="legend-item"><div class="legend-dot" style="background:var(--piston-tr)"></div>Piston Transient (P1–P10)</div>
+          <div class="legend-item"><div class="legend-dot" style="background:var(--hold)"></div>Hold / Other</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AIRCRAFT TAB -->
+    <div class="tab-content" id="tab-aircraft">
+      <div class="aircraft-header">
+        <div>
+          <div class="aircraft-count" id="aircraftCount">0</div>
+          <div class="aircraft-label">AIRCRAFT ON FIELD</div>
+        </div>
+        <button class="btn-primary" style="width:auto;padding:6px 14px;font-size:13px" onclick="loadCards()">↻ REFRESH</button>
+      </div>
+      <div class="aircraft-list" id="aircraftList">
+        <div class="empty-state">
+          <div class="empty-icon">✈</div>
+          <div class="empty-title">No aircraft loaded</div>
+          <div class="empty-sub">Connect to Trello and load cards to see aircraft positions</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="map"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── RAMP DATABASE ──────────────────────────────────────────────
+// Coordinates estimated from KHTO layout. Fine-tune as needed.
+const RAMP_DB = {
+  'J1':  { lat: 40.95935, lng: -72.25390, type: 'jet',       color: '#ff6b35' },
+  'J2':  { lat: 40.95910, lng: -72.25390, type: 'jet',       color: '#ff6b35' },
+  'J3':  { lat: 40.95960, lng: -72.25340, type: 'jet',       color: '#ff6b35' },
+  'J4':  { lat: 40.95940, lng: -72.25340, type: 'jet',       color: '#ff6b35' },
+  'J5':  { lat: 40.95920, lng: -72.25340, type: 'jet',       color: '#ff6b35' },
+  'J6':  { lat: 40.95900, lng: -72.25340, type: 'jet',       color: '#ff6b35' },
+  'J7':  { lat: 40.95965, lng: -72.25410, type: 'jet',       color: '#ff6b35' },
+  'J8':  { lat: 40.95945, lng: -72.25410, type: 'jet',       color: '#ff6b35' },
+  'J9':  { lat: 40.95925, lng: -72.25410, type: 'jet',       color: '#ff6b35' },
+  'J10': { lat: 40.95905, lng: -72.25410, type: 'jet',       color: '#ff6b35' },
+  'A':   { lat: 40.95985, lng: -72.25250, type: 'turbo',     color: '#7be83e' },
+  'B':   { lat: 40.95960, lng: -72.25240, type: 'turbo',     color: '#7be83e' },
+  'C':   { lat: 40.95940, lng: -72.25230, type: 'turbo',     color: '#7be83e' },
+  'D':   { lat: 40.95920, lng: -72.25220, type: 'turbo',     color: '#7be83e' },
+  'E':   { lat: 40.95900, lng: -72.25210, type: 'turbo',     color: '#7be83e' },
+  'F':   { lat: 40.95880, lng: -72.25200, type: 'turbo',     color: '#7be83e' },
+  'H1':  { lat: 40.96020, lng: -72.25180, type: 'heli',      color: '#4db8ff' },
+  'H2':  { lat: 40.96040, lng: -72.25160, type: 'heli',      color: '#4db8ff' },
+  'H3':  { lat: 40.96060, lng: -72.25140, type: 'heli',      color: '#4db8ff' },
+  'H4':  { lat: 40.96080, lng: -72.25120, type: 'heli',      color: '#4db8ff' },
+  'H5':  { lat: 40.96100, lng: -72.25100, type: 'heli',      color: '#4db8ff' },
+  'H6':  { lat: 40.96115, lng: -72.25080, type: 'heli',      color: '#4db8ff' },
+  'H7':  { lat: 40.96130, lng: -72.25060, type: 'heli',      color: '#4db8ff' },
+  'T1':  { lat: 40.96050, lng: -72.25480, type: 'piston-td', color: '#c084fc' },
+  'T2':  { lat: 40.96055, lng: -72.25460, type: 'piston-td', color: '#c084fc' },
+  'T3':  { lat: 40.96060, lng: -72.25440, type: 'piston-td', color: '#c084fc' },
+  'T4':  { lat: 40.96065, lng: -72.25420, type: 'piston-td', color: '#c084fc' },
+  'T5':  { lat: 40.96080, lng: -72.25470, type: 'piston-td', color: '#c084fc' },
+  'T6':  { lat: 40.96085, lng: -72.25450, type: 'piston-td', color: '#c084fc' },
+  'T7':  { lat: 40.96100, lng: -72.25475, type: 'piston-td', color: '#c084fc' },
+  'T8':  { lat: 40.96105, lng: -72.25455, type: 'piston-td', color: '#c084fc' },
+  'P1':  { lat: 40.95980, lng: -72.25700, type: 'piston-tr', color: '#a855f7' },
+  'P2':  { lat: 40.95960, lng: -72.25710, type: 'piston-tr', color: '#a855f7' },
+  'P3':  { lat: 40.95945, lng: -72.25720, type: 'piston-tr', color: '#a855f7' },
+  'P4':  { lat: 40.95930, lng: -72.25715, type: 'piston-tr', color: '#a855f7' },
+  'P5':  { lat: 40.95915, lng: -72.25705, type: 'piston-tr', color: '#a855f7' },
+  'P6':  { lat: 40.95975, lng: -72.25730, type: 'piston-tr', color: '#a855f7' },
+  'P7':  { lat: 40.95958, lng: -72.25738, type: 'piston-tr', color: '#a855f7' },
+  'P8':  { lat: 40.95940, lng: -72.25740, type: 'piston-tr', color: '#a855f7' },
+  'P9':  { lat: 40.95922, lng: -72.25732, type: 'piston-tr', color: '#a855f7' },
+  'P10': { lat: 40.95905, lng: -72.25722, type: 'piston-tr', color: '#a855f7' },
+  'HOLD 1': { lat: 40.95840, lng: -72.25780, type: 'hold',   color: '#ef4444' },
+  'HOLD 2': { lat: 40.95860, lng: -72.25310, type: 'hold',   color: '#ef4444' },
+  'X':   { lat: 40.95848, lng: -72.25740, type: 'other',     color: '#94a3b8' },
+  'Y':   { lat: 40.95848, lng: -72.25760, type: 'other',     color: '#94a3b8' },
+  'Z':   { lat: 40.95848, lng: -72.25780, type: 'other',     color: '#94a3b8' },
+  'H9':  { lat: 40.96010, lng: -72.25580, type: 'heli',      color: '#4db8ff' },
+  'H10': { lat: 40.96000, lng: -72.25600, type: 'heli',      color: '#4db8ff' },
+};
+
+// ─── STATE ──────────────────────────────────────────────────────
+let map = null;
+let markers = {};
+let refreshTimer = null;
+let aircraftData = [];
+
+// ─── PERSIST KEYS IN LOCALSTORAGE ───────────────────────────────
+window.addEventListener('load', () => {
+  document.getElementById('trelloKey').value   = localStorage.getItem('khto_trello_key')   || '';
+  document.getElementById('trelloToken').value = localStorage.getItem('khto_trello_token') || '';
+  document.getElementById('mapboxToken').value = localStorage.getItem('khto_mapbox_token') || '';
+  document.getElementById('rampFieldName').value = localStorage.getItem('khto_ramp_field') || 'Ramp Position';
+});
+
+function saveKeys() {
+  localStorage.setItem('khto_trello_key',   document.getElementById('trelloKey').value.trim());
+  localStorage.setItem('khto_trello_token', document.getElementById('trelloToken').value.trim());
+  localStorage.setItem('khto_mapbox_token', document.getElementById('mapboxToken').value.trim());
+  localStorage.setItem('khto_ramp_field',   document.getElementById('rampFieldName').value.trim());
+}
+
+// ─── TAB SWITCHING ───────────────────────────────────────────────
+function switchTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach((b, i) =>
+    b.classList.toggle('active', ['settings','aircraft'][i] === tab));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+}
+
+// ─── TOAST ───────────────────────────────────────────────────────
+function showToast(msg, isError = true) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.background = isError ? '#ef4444' : '#22c55e';
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+// ─── MAPBOX INIT ─────────────────────────────────────────────────
+function initMap(token) {
+  if (map) { map.remove(); map = null; markers = {}; }
+  mapboxgl.accessToken = token;
+  map = new mapboxgl.Map({
+    container: 'map',
+    style: 'mapbox://styles/mapbox/satellite-streets-v12',
+    center: [-72.2518, 40.9598],
+    zoom: 15.5,
+    pitch: 30,
+  });
+  map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
+  map.addControl(new mapboxgl.FullscreenControl(), 'bottom-right');
+  map.on('load', () => { if (aircraftData.length) renderMarkers(); });
+}
+
+// ─── TRELLO CONNECT ──────────────────────────────────────────────
+async function connectTrello() {
+  const key   = document.getElementById('trelloKey').value.trim();
+  const token = document.getElementById('trelloToken').value.trim();
+  const mbToken = document.getElementById('mapboxToken').value.trim();
+
+  if (!key || !token) return showToast('Please enter your Trello API key and token.');
+  if (!mbToken)       return showToast('Please enter your Mapbox access token.');
+
+  const btn = document.getElementById('connectBtn');
+  btn.disabled = true; btn.textContent = 'CONNECTING...';
+
+  try {
+    const res = await fetch(`https://api.trello.com/1/members/me/boards?key=${key}&token=${token}&fields=id,name`);
+    if (!res.ok) throw new Error('Invalid Trello credentials — check your key and token.');
+    const boards = await res.json();
+
+    const sel = document.getElementById('boardSelect');
+    sel.innerHTML = boards.map(b => `<option value="${b.id}">${b.name}</option>`).join('');
+    document.getElementById('boardSection').style.display = 'block';
+
+    document.getElementById('statusDot').classList.add('live');
+    document.getElementById('statusText').textContent = 'CONNECTED';
+
+    saveKeys();
+    initMap(mbToken);
+    showToast('Connected to Trello!', false);
+  } catch(e) {
+    showToast(e.message || 'Failed to connect to Trello');
+  }
+
+  btn.disabled = false; btn.textContent = 'CONNECT TO TRELLO';
+}
+
+// ─── LOAD CARDS ──────────────────────────────────────────────────
+async function loadCards() {
+  const key     = document.getElementById('trelloKey').value.trim();
+  const token   = document.getElementById('trelloToken').value.trim();
+  const boardId = document.getElementById('boardSelect').value;
+  const rampFieldName = document.getElementById('rampFieldName').value.trim().toLowerCase();
+
+  if (!key || !token || !boardId) return showToast('Please connect to Trello first.');
+
+  const loadBtn = document.getElementById('loadBtn');
+  if (loadBtn) { loadBtn.disabled = true; loadBtn.textContent = 'LOADING...'; }
+
+  try {
+    // Fetch custom fields
+    const cfRes = await fetch(`https://api.trello.com/1/boards/${boardId}/customFields?key=${key}&token=${token}`);
+    const customFields = cfRes.ok ? await cfRes.json() : [];
+    const rampField = customFields.find(f =>
+      f.name.toLowerCase().includes(rampFieldName) ||
+      f.name.toLowerCase().includes('ramp')
+    );
+
+    // Fetch cards
+    const cardsRes = await fetch(
+      `https://api.trello.com/1/boards/${boardId}/cards?key=${key}&token=${token}&customFieldItems=true&fields=name,due,idList`
+    );
+    if (!cardsRes.ok) throw new Error('Failed to fetch Trello cards.');
+    const cards = await cardsRes.json();
+
+    aircraftData = [];
+
+    for (const card of cards) {
+      const tailNumber = card.name;
+      const due = card.due;
+
+      let rampPosition = null;
+      if (rampField && card.customFieldItems) {
+        const fi = card.customFieldItems.find(x => x.idCustomField === rampField.id);
+        if (fi) {
+          if (fi.value?.text) {
+            rampPosition = fi.value.text;
+          } else if (fi.idValue) {
+            const opt = rampField.options?.find(o => o.id === fi.idValue);
+            rampPosition = opt ? opt.value.text : fi.idValue;
+          }
+        }
+      }
+
+      if (!rampPosition) continue;
+      const rampKey = rampPosition.toUpperCase().trim();
+      const rampData = RAMP_DB[rampKey];
+      if (!rampData) continue;
+
+      aircraftData.push({ tailNumber, due, rampPosition: rampKey, rampData, cardId: card.id });
+    }
+
+    saveKeys();
+    renderAircraftList();
+    renderMarkers();
+    document.getElementById('aircraftCount').textContent = aircraftData.length;
+    switchTab('aircraft');
+
+    clearInterval(refreshTimer);
+    const interval = parseInt(document.getElementById('refreshInterval').value) * 1000;
+    if (interval > 0) refreshTimer = setInterval(loadCards, interval);
+
+    showToast(`Loaded ${aircraftData.length} aircraft on field`, false);
+  } catch(e) {
+    showToast(e.message || 'Failed to load cards');
+  }
+
+  if (loadBtn) { loadBtn.disabled = false; loadBtn.textContent = 'LOAD AIRCRAFT'; }
+}
+
+// ─── FORMAT DATE ────────────────────────────────────────────────
+function formatDue(due) {
+  if (!due) return { label: 'No due date', cls: '' };
+  const d = new Date(due);
+  const diff = (d - new Date()) / 86400000;
+  const label = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  if (diff < 0)  return { label: `⚠ ${label}`, cls: 'overdue' };
+  if (diff < 1)  return { label: `🔴 TODAY`, cls: 'today' };
+  return { label, cls: '' };
+}
+
+// ─── RENDER AIRCRAFT LIST ────────────────────────────────────────
+function renderAircraftList() {
+  const list = document.getElementById('aircraftList');
+  if (!aircraftData.length) {
+    list.innerHTML = `<div class="empty-state">
+      <div class="empty-icon">✈</div>
+      <div class="empty-title">No aircraft found</div>
+      <div class="empty-sub">No cards with known ramp positions were found on this board.</div>
+    </div>`;
+    return;
+  }
+  list.innerHTML = aircraftData.map((a, i) => {
+    const { label, cls } = formatDue(a.due);
+    return `<div class="aircraft-item" id="item-${i}" onclick="selectAircraft(${i})">
+      <div class="aircraft-ramp-badge" style="background:${a.rampData.color}">${a.rampPosition}</div>
+      <div class="aircraft-info">
+        <div class="aircraft-tail">${a.tailNumber}</div>
+        <div class="aircraft-due ${cls}">${label}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ─── RENDER MARKERS ──────────────────────────────────────────────
+function renderMarkers() {
+  if (!map) return;
+  Object.values(markers).forEach(m => m.remove());
+  markers = {};
+
+  aircraftData.forEach((a, i) => {
+    const { lat, lng, color } = a.rampData;
+    const { label: dueLabel } = formatDue(a.due);
+
+    const el = document.createElement('div');
+    el.style.cssText = `
+      background:${color};color:#000;
+      font-family:'Bebas Neue',sans-serif;
+      font-size:11px;padding:3px 7px;
+      border-radius:6px;cursor:pointer;
+      box-shadow:0 2px 12px rgba(0,0,0,.5);
+      white-space:nowrap;line-height:1.4;
+      border:2px solid rgba(255,255,255,.25);
+      text-align:center;transition:transform .15s;
+    `;
+    el.innerHTML = `<div style="letter-spacing:1px">${a.tailNumber}</div><div style="font-size:9px;opacity:.8">${a.rampPosition}</div>`;
+    el.addEventListener('mouseenter', () => { el.style.transform='scale(1.1)'; el.style.zIndex=999; });
+    el.addEventListener('mouseleave', () => { el.style.transform='scale(1)'; el.style.zIndex=''; });
+
+    const popup = new mapboxgl.Popup({ offset: 10, closeButton: true, maxWidth: '220px' })
+      .setHTML(`
+        <div class="popup-tail">${a.tailNumber}</div>
+        <div class="popup-ramp">RAMP ${a.rampPosition}</div>
+        <div class="popup-due">
+          <div class="popup-due-label">Departure Due</div>
+          <div style="margin-top:3px">${dueLabel}</div>
+        </div>
+      `);
+
+    const marker = new mapboxgl.Marker({ element: el })
+      .setLngLat([lng, lat])
+      .setPopup(popup)
+      .addTo(map);
+
+    el.addEventListener('click', () => selectAircraft(i));
+    markers[i] = marker;
+  });
+}
+
+// ─── SELECT AIRCRAFT ─────────────────────────────────────────────
+function selectAircraft(i) {
+  document.querySelectorAll('.aircraft-item').forEach(el => el.classList.remove('selected'));
+  const item = document.getElementById('item-' + i);
+  if (item) { item.classList.add('selected'); item.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }
+
+  const a = aircraftData[i];
+  if (!a || !map) return;
+
+  map.flyTo({ center: [a.rampData.lng, a.rampData.lat], zoom: 17.5, speed: 1.2, pitch: 45 });
+  Object.values(markers).forEach(m => m.getPopup()?.remove());
+  markers[i]?.togglePopup();
+  switchTab('aircraft');
+}
+</script>
+</body>
+</html>

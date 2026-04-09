@@ -388,57 +388,122 @@
 
 <script>
 // ─── RAMP DATABASE ──────────────────────────────────────────────
+// Keys match Trello label names (case-insensitive lookup applied below)
 // Coordinates estimated from KHTO layout. Fine-tune as needed.
 const RAMP_DB = {
-  'J1':  { lat: 40.95935, lng: -72.25390, type: 'jet',       color: '#ff6b35' },
-  'J2':  { lat: 40.95910, lng: -72.25390, type: 'jet',       color: '#ff6b35' },
-  'J3':  { lat: 40.95960, lng: -72.25340, type: 'jet',       color: '#ff6b35' },
-  'J4':  { lat: 40.95940, lng: -72.25340, type: 'jet',       color: '#ff6b35' },
-  'J5':  { lat: 40.95920, lng: -72.25340, type: 'jet',       color: '#ff6b35' },
-  'J6':  { lat: 40.95900, lng: -72.25340, type: 'jet',       color: '#ff6b35' },
-  'J7':  { lat: 40.95965, lng: -72.25410, type: 'jet',       color: '#ff6b35' },
-  'J8':  { lat: 40.95945, lng: -72.25410, type: 'jet',       color: '#ff6b35' },
-  'J9':  { lat: 40.95925, lng: -72.25410, type: 'jet',       color: '#ff6b35' },
-  'J10': { lat: 40.95905, lng: -72.25410, type: 'jet',       color: '#ff6b35' },
-  'A':   { lat: 40.95985, lng: -72.25250, type: 'turbo',     color: '#7be83e' },
-  'B':   { lat: 40.95960, lng: -72.25240, type: 'turbo',     color: '#7be83e' },
-  'C':   { lat: 40.95940, lng: -72.25230, type: 'turbo',     color: '#7be83e' },
-  'D':   { lat: 40.95920, lng: -72.25220, type: 'turbo',     color: '#7be83e' },
-  'E':   { lat: 40.95900, lng: -72.25210, type: 'turbo',     color: '#7be83e' },
-  'F':   { lat: 40.95880, lng: -72.25200, type: 'turbo',     color: '#7be83e' },
-  'H1':  { lat: 40.96020, lng: -72.25180, type: 'heli',      color: '#4db8ff' },
-  'H2':  { lat: 40.96040, lng: -72.25160, type: 'heli',      color: '#4db8ff' },
-  'H3':  { lat: 40.96060, lng: -72.25140, type: 'heli',      color: '#4db8ff' },
-  'H4':  { lat: 40.96080, lng: -72.25120, type: 'heli',      color: '#4db8ff' },
-  'H5':  { lat: 40.96100, lng: -72.25100, type: 'heli',      color: '#4db8ff' },
-  'H6':  { lat: 40.96115, lng: -72.25080, type: 'heli',      color: '#4db8ff' },
-  'H7':  { lat: 40.96130, lng: -72.25060, type: 'heli',      color: '#4db8ff' },
-  'T1':  { lat: 40.96050, lng: -72.25480, type: 'piston-td', color: '#c084fc' },
-  'T2':  { lat: 40.96055, lng: -72.25460, type: 'piston-td', color: '#c084fc' },
-  'T3':  { lat: 40.96060, lng: -72.25440, type: 'piston-td', color: '#c084fc' },
-  'T4':  { lat: 40.96065, lng: -72.25420, type: 'piston-td', color: '#c084fc' },
-  'T5':  { lat: 40.96080, lng: -72.25470, type: 'piston-td', color: '#c084fc' },
-  'T6':  { lat: 40.96085, lng: -72.25450, type: 'piston-td', color: '#c084fc' },
-  'T7':  { lat: 40.96100, lng: -72.25475, type: 'piston-td', color: '#c084fc' },
-  'T8':  { lat: 40.96105, lng: -72.25455, type: 'piston-td', color: '#c084fc' },
-  'P1':  { lat: 40.95980, lng: -72.25700, type: 'piston-tr', color: '#a855f7' },
-  'P2':  { lat: 40.95960, lng: -72.25710, type: 'piston-tr', color: '#a855f7' },
-  'P3':  { lat: 40.95945, lng: -72.25720, type: 'piston-tr', color: '#a855f7' },
-  'P4':  { lat: 40.95930, lng: -72.25715, type: 'piston-tr', color: '#a855f7' },
-  'P5':  { lat: 40.95915, lng: -72.25705, type: 'piston-tr', color: '#a855f7' },
-  'P6':  { lat: 40.95975, lng: -72.25730, type: 'piston-tr', color: '#a855f7' },
-  'P7':  { lat: 40.95958, lng: -72.25738, type: 'piston-tr', color: '#a855f7' },
-  'P8':  { lat: 40.95940, lng: -72.25740, type: 'piston-tr', color: '#a855f7' },
-  'P9':  { lat: 40.95922, lng: -72.25732, type: 'piston-tr', color: '#a855f7' },
-  'P10': { lat: 40.95905, lng: -72.25722, type: 'piston-tr', color: '#a855f7' },
-  'HOLD 1': { lat: 40.95840, lng: -72.25780, type: 'hold',   color: '#ef4444' },
-  'HOLD 2': { lat: 40.95860, lng: -72.25310, type: 'hold',   color: '#ef4444' },
-  'X':   { lat: 40.95848, lng: -72.25740, type: 'other',     color: '#94a3b8' },
-  'Y':   { lat: 40.95848, lng: -72.25760, type: 'other',     color: '#94a3b8' },
-  'Z':   { lat: 40.95848, lng: -72.25780, type: 'other',     color: '#94a3b8' },
-  'H9':  { lat: 40.96010, lng: -72.25580, type: 'heli',      color: '#4db8ff' },
-  'H10': { lat: 40.96000, lng: -72.25600, type: 'heli',      color: '#4db8ff' },
+  // JET MAIN — label format: "Jet Main J1" etc.
+  'JET MAIN J1':  { lat: 40.95935, lng: -72.25390, type: 'jet', color: '#ff6b35', short: 'J1' },
+  'JET MAIN J2':  { lat: 40.95910, lng: -72.25390, type: 'jet', color: '#ff6b35', short: 'J2' },
+  'JET MAIN J3':  { lat: 40.95960, lng: -72.25340, type: 'jet', color: '#ff6b35', short: 'J3' },
+  'JET MAIN J4':  { lat: 40.95940, lng: -72.25340, type: 'jet', color: '#ff6b35', short: 'J4' },
+  'JET MAIN J5':  { lat: 40.95920, lng: -72.25340, type: 'jet', color: '#ff6b35', short: 'J5' },
+  'JET MAIN J6':  { lat: 40.95900, lng: -72.25340, type: 'jet', color: '#ff6b35', short: 'J6' },
+  'JET MAIN J7':  { lat: 40.95965, lng: -72.25410, type: 'jet', color: '#ff6b35', short: 'J7' },
+  'JET MAIN J8':  { lat: 40.95945, lng: -72.25410, type: 'jet', color: '#ff6b35', short: 'J8' },
+  'JET MAIN J9':  { lat: 40.95925, lng: -72.25410, type: 'jet', color: '#ff6b35', short: 'J9' },
+  'JET MAIN J10': { lat: 40.95905, lng: -72.25410, type: 'jet', color: '#ff6b35', short: 'J10' },
+  // Also support shorthand keys
+  'J1':  { lat: 40.95935, lng: -72.25390, type: 'jet', color: '#ff6b35', short: 'J1' },
+  'J2':  { lat: 40.95910, lng: -72.25390, type: 'jet', color: '#ff6b35', short: 'J2' },
+  'J3':  { lat: 40.95960, lng: -72.25340, type: 'jet', color: '#ff6b35', short: 'J3' },
+  'J4':  { lat: 40.95940, lng: -72.25340, type: 'jet', color: '#ff6b35', short: 'J4' },
+  'J5':  { lat: 40.95920, lng: -72.25340, type: 'jet', color: '#ff6b35', short: 'J5' },
+  'J6':  { lat: 40.95900, lng: -72.25340, type: 'jet', color: '#ff6b35', short: 'J6' },
+  'J7':  { lat: 40.95965, lng: -72.25410, type: 'jet', color: '#ff6b35', short: 'J7' },
+  'J8':  { lat: 40.95945, lng: -72.25410, type: 'jet', color: '#ff6b35', short: 'J8' },
+  'J9':  { lat: 40.95925, lng: -72.25410, type: 'jet', color: '#ff6b35', short: 'J9' },
+  'J10': { lat: 40.95905, lng: -72.25410, type: 'jet', color: '#ff6b35', short: 'J10' },
+
+  // TURBO PROP — label format: "Turbo Prop A" etc.
+  'TURBO PROP A': { lat: 40.95985, lng: -72.25250, type: 'turbo', color: '#7be83e', short: 'A' },
+  'TURBO PROP B': { lat: 40.95960, lng: -72.25240, type: 'turbo', color: '#7be83e', short: 'B' },
+  'TURBO PROP C': { lat: 40.95940, lng: -72.25230, type: 'turbo', color: '#7be83e', short: 'C' },
+  'TURBO PROP D': { lat: 40.95920, lng: -72.25220, type: 'turbo', color: '#7be83e', short: 'D' },
+  'TURBO PROP E': { lat: 40.95900, lng: -72.25210, type: 'turbo', color: '#7be83e', short: 'E' },
+  'TURBO PROP F': { lat: 40.95880, lng: -72.25200, type: 'turbo', color: '#7be83e', short: 'F' },
+  'A': { lat: 40.95985, lng: -72.25250, type: 'turbo', color: '#7be83e', short: 'A' },
+  'B': { lat: 40.95960, lng: -72.25240, type: 'turbo', color: '#7be83e', short: 'B' },
+  'C': { lat: 40.95940, lng: -72.25230, type: 'turbo', color: '#7be83e', short: 'C' },
+  'D': { lat: 40.95920, lng: -72.25220, type: 'turbo', color: '#7be83e', short: 'D' },
+  'E': { lat: 40.95900, lng: -72.25210, type: 'turbo', color: '#7be83e', short: 'E' },
+  'F': { lat: 40.95880, lng: -72.25200, type: 'turbo', color: '#7be83e', short: 'F' },
+
+  // HELICOPTER — label format: "Helicopter H1" etc.
+  'HELICOPTER H1':  { lat: 40.96020, lng: -72.25180, type: 'heli', color: '#4db8ff', short: 'H1' },
+  'HELICOPTER H2':  { lat: 40.96040, lng: -72.25160, type: 'heli', color: '#4db8ff', short: 'H2' },
+  'HELICOPTER H3':  { lat: 40.96060, lng: -72.25140, type: 'heli', color: '#4db8ff', short: 'H3' },
+  'HELICOPTER H4':  { lat: 40.96080, lng: -72.25120, type: 'heli', color: '#4db8ff', short: 'H4' },
+  'HELICOPTER H5':  { lat: 40.96100, lng: -72.25100, type: 'heli', color: '#4db8ff', short: 'H5' },
+  'HELICOPTER H6':  { lat: 40.96115, lng: -72.25080, type: 'heli', color: '#4db8ff', short: 'H6' },
+  'HELICOPTER H7':  { lat: 40.96130, lng: -72.25060, type: 'heli', color: '#4db8ff', short: 'H7' },
+  'H1':  { lat: 40.96020, lng: -72.25180, type: 'heli', color: '#4db8ff', short: 'H1' },
+  'H2':  { lat: 40.96040, lng: -72.25160, type: 'heli', color: '#4db8ff', short: 'H2' },
+  'H3':  { lat: 40.96060, lng: -72.25140, type: 'heli', color: '#4db8ff', short: 'H3' },
+  'H4':  { lat: 40.96080, lng: -72.25120, type: 'heli', color: '#4db8ff', short: 'H4' },
+  'H5':  { lat: 40.96100, lng: -72.25100, type: 'heli', color: '#4db8ff', short: 'H5' },
+  'H6':  { lat: 40.96115, lng: -72.25080, type: 'heli', color: '#4db8ff', short: 'H6' },
+  'H7':  { lat: 40.96130, lng: -72.25060, type: 'heli', color: '#4db8ff', short: 'H7' },
+
+  // PISTON TIE DOWN — label format: "Piston Tie Down T1" etc.
+  'PISTON TIE DOWN T1': { lat: 40.96050, lng: -72.25480, type: 'piston-td', color: '#c084fc', short: 'T1' },
+  'PISTON TIE DOWN T2': { lat: 40.96055, lng: -72.25460, type: 'piston-td', color: '#c084fc', short: 'T2' },
+  'PISTON TIE DOWN T3': { lat: 40.96060, lng: -72.25440, type: 'piston-td', color: '#c084fc', short: 'T3' },
+  'PISTON TIE DOWN T4': { lat: 40.96065, lng: -72.25420, type: 'piston-td', color: '#c084fc', short: 'T4' },
+  'PISTON TIE DOWN T5': { lat: 40.96080, lng: -72.25470, type: 'piston-td', color: '#c084fc', short: 'T5' },
+  'PISTON TIE DOWN T6': { lat: 40.96085, lng: -72.25450, type: 'piston-td', color: '#c084fc', short: 'T6' },
+  'PISTON TIE DOWN T7': { lat: 40.96100, lng: -72.25475, type: 'piston-td', color: '#c084fc', short: 'T7' },
+  'PISTON TIE DOWN T8': { lat: 40.96105, lng: -72.25455, type: 'piston-td', color: '#c084fc', short: 'T8' },
+  'T1': { lat: 40.96050, lng: -72.25480, type: 'piston-td', color: '#c084fc', short: 'T1' },
+  'T2': { lat: 40.96055, lng: -72.25460, type: 'piston-td', color: '#c084fc', short: 'T2' },
+  'T3': { lat: 40.96060, lng: -72.25440, type: 'piston-td', color: '#c084fc', short: 'T3' },
+  'T4': { lat: 40.96065, lng: -72.25420, type: 'piston-td', color: '#c084fc', short: 'T4' },
+  'T5': { lat: 40.96080, lng: -72.25470, type: 'piston-td', color: '#c084fc', short: 'T5' },
+  'T6': { lat: 40.96085, lng: -72.25450, type: 'piston-td', color: '#c084fc', short: 'T6' },
+  'T7': { lat: 40.96100, lng: -72.25475, type: 'piston-td', color: '#c084fc', short: 'T7' },
+  'T8': { lat: 40.96105, lng: -72.25455, type: 'piston-td', color: '#c084fc', short: 'T8' },
+
+  // PISTON TRANSIENT — label format: "Piston Transient P1" etc.
+  'PISTON TRANSIENT P1':  { lat: 40.95980, lng: -72.25700, type: 'piston-tr', color: '#a855f7', short: 'P1' },
+  'PISTON TRANSIENT P2':  { lat: 40.95960, lng: -72.25710, type: 'piston-tr', color: '#a855f7', short: 'P2' },
+  'PISTON TRANSIENT P3':  { lat: 40.95945, lng: -72.25720, type: 'piston-tr', color: '#a855f7', short: 'P3' },
+  'PISTON TRANSIENT P4':  { lat: 40.95930, lng: -72.25715, type: 'piston-tr', color: '#a855f7', short: 'P4' },
+  'PISTON TRANSIENT P5':  { lat: 40.95915, lng: -72.25705, type: 'piston-tr', color: '#a855f7', short: 'P5' },
+  'PISTON TRANSIENT P6':  { lat: 40.95975, lng: -72.25730, type: 'piston-tr', color: '#a855f7', short: 'P6' },
+  'PISTON TRANSIENT P7':  { lat: 40.95958, lng: -72.25738, type: 'piston-tr', color: '#a855f7', short: 'P7' },
+  'PISTON TRANSIENT P8':  { lat: 40.95940, lng: -72.25740, type: 'piston-tr', color: '#a855f7', short: 'P8' },
+  'PISTON TRANSIENT P9':  { lat: 40.95922, lng: -72.25732, type: 'piston-tr', color: '#a855f7', short: 'P9' },
+  'PISTON TRANSIENT P10': { lat: 40.95905, lng: -72.25722, type: 'piston-tr', color: '#a855f7', short: 'P10' },
+  'P1':  { lat: 40.95980, lng: -72.25700, type: 'piston-tr', color: '#a855f7', short: 'P1' },
+  'P2':  { lat: 40.95960, lng: -72.25710, type: 'piston-tr', color: '#a855f7', short: 'P2' },
+  'P3':  { lat: 40.95945, lng: -72.25720, type: 'piston-tr', color: '#a855f7', short: 'P3' },
+  'P4':  { lat: 40.95930, lng: -72.25715, type: 'piston-tr', color: '#a855f7', short: 'P4' },
+  'P5':  { lat: 40.95915, lng: -72.25705, type: 'piston-tr', color: '#a855f7', short: 'P5' },
+  'P6':  { lat: 40.95975, lng: -72.25730, type: 'piston-tr', color: '#a855f7', short: 'P6' },
+  'P7':  { lat: 40.95958, lng: -72.25738, type: 'piston-tr', color: '#a855f7', short: 'P7' },
+  'P8':  { lat: 40.95940, lng: -72.25740, type: 'piston-tr', color: '#a855f7', short: 'P8' },
+  'P9':  { lat: 40.95922, lng: -72.25732, type: 'piston-tr', color: '#a855f7', short: 'P9' },
+  'P10': { lat: 40.95905, lng: -72.25722, type: 'piston-tr', color: '#a855f7', short: 'P10' },
+
+  // HOLD
+  'HOLD 1': { lat: 40.95840, lng: -72.25780, type: 'hold', color: '#ef4444', short: 'HOLD 1' },
+  'HOLD 2': { lat: 40.95860, lng: -72.25310, type: 'hold', color: '#ef4444', short: 'HOLD 2' },
+
+  // OTHER
+  'X': { lat: 40.95848, lng: -72.25740, type: 'other', color: '#94a3b8', short: 'X' },
+  'Y': { lat: 40.95848, lng: -72.25760, type: 'other', color: '#94a3b8', short: 'Y' },
+  'Z': { lat: 40.95848, lng: -72.25780, type: 'other', color: '#94a3b8', short: 'Z' },
+
+  // NORTH RAMP HANGARS
+  'H9':  { lat: 40.96010, lng: -72.25580, type: 'heli', color: '#4db8ff', short: 'H9' },
+  'H10': { lat: 40.96000, lng: -72.25600, type: 'heli', color: '#4db8ff', short: 'H10' },
 };
+
+// Lookup ramp by label name — case-insensitive, trims whitespace
+function lookupRamp(labelName) {
+  if (!labelName) return null;
+  const key = labelName.trim().toUpperCase();
+  return RAMP_DB[key] || null;
+}
 
 // ─── STATE ──────────────────────────────────────────────────────
 let map = null;
@@ -541,17 +606,9 @@ async function loadCards() {
   if (loadBtn) { loadBtn.disabled = true; loadBtn.textContent = 'LOADING...'; }
 
   try {
-    // Fetch custom fields
-    const cfRes = await fetch(`https://api.trello.com/1/boards/${boardId}/customFields?key=${key}&token=${token}`);
-    const customFields = cfRes.ok ? await cfRes.json() : [];
-    const rampField = customFields.find(f =>
-      f.name.toLowerCase().includes(rampFieldName) ||
-      f.name.toLowerCase().includes('ramp')
-    );
-
-    // Fetch cards
+    // Fetch cards with labels
     const cardsRes = await fetch(
-      `https://api.trello.com/1/boards/${boardId}/cards?key=${key}&token=${token}&customFieldItems=true&fields=name,due,idList`
+      `https://api.trello.com/1/boards/${boardId}/cards?key=${key}&token=${token}&fields=name,due,labels`
     );
     if (!cardsRes.ok) throw new Error('Failed to fetch Trello cards.');
     const cards = await cardsRes.json();
@@ -562,25 +619,24 @@ async function loadCards() {
       const tailNumber = card.name;
       const due = card.due;
 
+      // Find first label that matches a known ramp position
+      let rampData = null;
       let rampPosition = null;
-      if (rampField && card.customFieldItems) {
-        const fi = card.customFieldItems.find(x => x.idCustomField === rampField.id);
-        if (fi) {
-          if (fi.value?.text) {
-            rampPosition = fi.value.text;
-          } else if (fi.idValue) {
-            const opt = rampField.options?.find(o => o.id === fi.idValue);
-            rampPosition = opt ? opt.value.text : fi.idValue;
+
+      if (card.labels && card.labels.length > 0) {
+        for (const label of card.labels) {
+          const found = lookupRamp(label.name);
+          if (found) {
+            rampData = found;
+            rampPosition = label.name.trim();
+            break;
           }
         }
       }
 
-      if (!rampPosition) continue;
-      const rampKey = rampPosition.toUpperCase().trim();
-      const rampData = RAMP_DB[rampKey];
-      if (!rampData) continue;
+      if (!rampData) continue; // skip cards with no matching ramp label
 
-      aircraftData.push({ tailNumber, due, rampPosition: rampKey, rampData, cardId: card.id });
+      aircraftData.push({ tailNumber, due, rampPosition, rampData, cardId: card.id });
     }
 
     saveKeys();
@@ -656,14 +712,15 @@ function renderMarkers() {
       border:2px solid rgba(255,255,255,.25);
       text-align:center;transition:transform .15s;
     `;
-    el.innerHTML = `<div style="letter-spacing:1px">${a.tailNumber}</div><div style="font-size:9px;opacity:.8">${a.rampPosition}</div>`;
+    const shortName = a.rampData.short || a.rampPosition;
+    el.innerHTML = `<div style="letter-spacing:1px">${a.tailNumber}</div><div style="font-size:9px;opacity:.8">${shortName}</div>`;
     el.addEventListener('mouseenter', () => { el.style.transform='scale(1.1)'; el.style.zIndex=999; });
     el.addEventListener('mouseleave', () => { el.style.transform='scale(1)'; el.style.zIndex=''; });
 
     const popup = new mapboxgl.Popup({ offset: 10, closeButton: true, maxWidth: '220px' })
       .setHTML(`
         <div class="popup-tail">${a.tailNumber}</div>
-        <div class="popup-ramp">RAMP ${a.rampPosition}</div>
+        <div class="popup-ramp">${a.rampPosition}</div>
         <div class="popup-due">
           <div class="popup-due-label">Departure Due</div>
           <div style="margin-top:3px">${dueLabel}</div>

@@ -1,4 +1,4 @@
-<!-- KJPX Ramp Tracker v20260409f - full null-safe -->
+<!-- KJPX Ramp Tracker v20260409g - null-safe modal -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -506,10 +506,16 @@ function openSettings() {
   var modal = document.getElementById('settingsModal');
   if (!modal) return;
   modal.style.display = 'flex';
-  // Pre-fill with current values
-  document.getElementById('modal_trelloKey').value = document.getElementById('trelloKey').value || localStorage.getItem('khto_trello_key') || '';
-  document.getElementById('modal_trelloToken').value = document.getElementById('trelloToken').value || localStorage.getItem('khto_trello_token') || '';
-  document.getElementById('modal_mapboxToken').value = document.getElementById('mapboxToken').value || localStorage.getItem('khto_mapbox_token') || '';
+  // Pre-fill with current values safely
+  var mk = document.getElementById('modal_trelloKey');
+  var mt = document.getElementById('modal_trelloToken');
+  var mm = document.getElementById('modal_mapboxToken');
+  var hk = document.getElementById('trelloKey');
+  var ht = document.getElementById('trelloToken');
+  var hm = document.getElementById('mapboxToken');
+  if (mk) mk.value = (hk ? hk.value : '') || localStorage.getItem('khto_trello_key') || '';
+  if (mt) mt.value = (ht ? ht.value : '') || localStorage.getItem('khto_trello_token') || '';
+  if (mm) mm.value = (hm ? hm.value : '') || localStorage.getItem('khto_mapbox_token') || '';
 }
 
 function closeSettings() {

@@ -458,10 +458,10 @@ function renderMarkers() {
   markers = {};
   aircraftData.forEach(function(a, i) {
     var el = document.createElement('div');
-    el.style.cssText = 'background:' + a.rampData.color + ';color:#000;font-family:Bebas Neue,sans-serif;font-size:11px;padding:3px 7px;border-radius:6px;cursor:pointer;box-shadow:0 2px 12px rgba(0,0,0,.5);white-space:nowrap;line-height:1.4;border:2px solid rgba(255,255,255,.25);text-align:center;transition:transform .15s;';
+    el.style.cssText = 'background:' + a.rampData.color + ';color:#000;font-family:Bebas Neue,sans-serif;font-size:11px;padding:3px 7px;border-radius:6px;cursor:pointer;box-shadow:0 2px 12px rgba(0,0,0,.5);white-space:nowrap;line-height:1.4;border:2px solid rgba(255,255,255,.25);text-align:center;position:relative;';
     el.innerHTML = '<div style="letter-spacing:1px">' + a.tailNumber + '</div><div style="font-size:9px;opacity:.8">' + a.rampData.short + '</div>';
-    el.addEventListener('mouseenter', function() { el.style.transform = 'scale(1.1)'; });
-    el.addEventListener('mouseleave', function() { el.style.transform = 'scale(1)'; });
+    el.addEventListener('mouseenter', function() { el.style.outline = '2px solid white'; el.style.boxShadow = '0 4px 20px rgba(0,0,0,.7)'; });
+    el.addEventListener('mouseleave', function() { el.style.outline = 'none'; el.style.boxShadow = '0 2px 12px rgba(0,0,0,.5)'; });
     var due = formatDue(a.due);
     var popup = new mapboxgl.Popup({ offset: 10, closeButton: true, maxWidth: '220px' })
       .setHTML('<div class="popup-tail">' + a.tailNumber + '</div><div class="popup-ramp">' + a.rampPosition + '</div><div class="popup-due"><div class="popup-due-label">Departure Due</div><div style="margin-top:3px">' + due.label + '</div></div>');

@@ -263,14 +263,18 @@ var refreshTimer = null;
 var aircraftData = [];
 
 window.addEventListener('load', function() {
+  // Restore saved keys if available
   var t = localStorage.getItem('khto_trello_token');
   var m = localStorage.getItem('khto_mapbox_token');
   if (t) document.getElementById('trelloToken').value = t;
   if (m) document.getElementById('mapboxToken').value = m;
-  // Auto-connect if we have all keys saved
-  if (t && m) {
-    setTimeout(function() { connectTrello(); }, 500);
-  }
+  // Auto-connect using whatever is in the fields (pre-filled or saved)
+  setTimeout(function() {
+    var key = document.getElementById('trelloKey').value.trim();
+    var token = document.getElementById('trelloToken').value.trim();
+    var mapbox = document.getElementById('mapboxToken').value.trim();
+    if (key && token && mapbox) connectTrello();
+  }, 800);
 });
 
 function switchTab(tab) {

@@ -81,8 +81,36 @@ header{display:flex;align-items:center;justify-content:space-between;padding:10p
   <div class="header-right">
     <div class="status-dot" id="statusDot"></div>
     <div class="status-text" id="statusText">NOT CONNECTED</div>
+    <button onclick="openSettings()" style="background:none;border:1px solid var(--border);border-radius:6px;color:var(--muted);padding:4px 10px;cursor:pointer;font-size:14px;margin-left:8px;" title="Settings">⚙</button>
   </div>
 </header>
+
+<!-- SETTINGS MODAL -->
+<div id="settingsModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:999;align-items:center;justify-content:center;">
+  <div style="background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:24px;width:380px;max-width:90vw;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:var(--accent)">CONNECTION SETTINGS</div>
+      <button onclick="closeSettings()" style="background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;">✕</button>
+    </div>
+    <div style="margin-bottom:14px;">
+      <div class="field-label">Trello API Key</div>
+      <input class="field-input" type="text" id="modal_trelloKey" autocomplete="off" data-1p-ignore placeholder="91d4799..." />
+    </div>
+    <div style="margin-bottom:14px;">
+      <div class="field-label">Trello Token</div>
+      <input class="field-input" type="text" id="modal_trelloToken" autocomplete="off" data-1p-ignore placeholder="ATTA..." />
+    </div>
+    <div style="margin-bottom:20px;">
+      <div class="field-label">Mapbox Access Token</div>
+      <input class="field-input" type="text" id="modal_mapboxToken" autocomplete="off" data-1p-ignore placeholder="pk.eyJ1..." />
+    </div>
+    <div style="display:flex;gap:10px;">
+      <button onclick="saveSettings()" class="btn-primary" style="flex:1">SAVE & RECONNECT</button>
+      <button onclick="closeSettings()" class="btn-primary" style="flex:0 0 auto;width:auto;padding:10px 16px;background:var(--border);color:var(--text)">CANCEL</button>
+    </div>
+    <div id="modalErr" style="margin-top:10px;font-size:11px;color:#ef4444;font-family:'DM Mono',monospace;display:none;"></div>
+  </div>
+</div>
 <div class="main">
   <div class="sidebar">
     <div class="sidebar-tabs">
@@ -486,6 +514,52 @@ function renderMarkers() {
     markers[i] = marker;
   });
 }
+
+function openSettings() {
+  var modal = document.getElementById('settingsModal');
+  modal.style.display = 'flex';
+  // Pre-fill with current values
+  document.getElementById('modal_trelloKey').value = document.getElementById('trelloKey').value || localStorage.getItem('khto_trello_key') || '';
+  document.getElementById('modal_trelloToken').value = document.getElementById('trelloToken').value || localStorage.getItem('khto_trello_token') || '';
+  document.getElementById('modal_mapboxToken').value = document.getElementById('mapboxToken').value || localStorage.getItem('khto_mapbox_token') || '';
+}
+
+function closeSettings() {
+  document.getElementById('settingsModal').style.display = 'none';
+  document.getElementById('modalErr').style.display = 'none';
+}
+
+function saveSettings() {
+  var key = document.getElementById('modal_trelloKey').value.trim();
+  var token = document.getElementById('modal_trelloToken').value.trim();
+  var mapbox = document.getElementById('modal_mapboxToken').value.trim();
+  var err = document.getElementById('modalErr');
+
+  if (!key || !token || !mapbox) {
+    err.textContent = 'Please fill in all three fields.';
+    err.style.display = 'block';
+    return;
+  }
+
+  // Save to localStorage
+  localStorage.setItem('khto_trello_key', key);
+  localStorage.setItem('khto_trello_token', token);
+  localStorage.setItem('khto_mapbox_token', mapbox);
+
+  // Update hidden fields
+  document.getElementById('trelloKey').value = key;
+  document.getElementById('trelloToken').value = token;
+  document.getElementById('mapboxToken').value = mapbox;
+
+  closeSettings();
+  // Reconnect with new settings
+  connectTrello();
+}
+
+// Close modal when clicking outside
+document.getElementById('settingsModal') && document.getElementById('settingsModal').addEventListener('click', function(e) {
+  if (e.target === this) closeSettings();
+});
 
 function selectAircraft(i) {
   document.querySelectorAll('.aircraft-item').forEach(function(el) { el.classList.remove('selected'); });

@@ -1,4 +1,4 @@
-<!-- KJPX Ramp Tracker v20260409e - null-safe buttons -->
+<!-- KJPX Ramp Tracker v20260409f - full null-safe -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -376,7 +376,7 @@ async function connectTrello() {
       var savedBoard = localStorage.getItem('khto_board_id');
       if (savedBoard) sel.value = savedBoard;
     }
-    document.getElementById('boardSection').style.display = 'block';
+    var bs = document.getElementById('boardSection'); if (bs) bs.style.display = 'block';
     document.getElementById('statusDot').classList.add('live');
     document.getElementById('statusText').textContent = 'CONNECTED';
     localStorage.setItem('khto_trello_token', token);
@@ -504,6 +504,7 @@ function renderMarkers() {
 
 function openSettings() {
   var modal = document.getElementById('settingsModal');
+  if (!modal) return;
   modal.style.display = 'flex';
   // Pre-fill with current values
   document.getElementById('modal_trelloKey').value = document.getElementById('trelloKey').value || localStorage.getItem('khto_trello_key') || '';
@@ -512,8 +513,8 @@ function openSettings() {
 }
 
 function closeSettings() {
-  document.getElementById('settingsModal').style.display = 'none';
-  document.getElementById('modalErr').style.display = 'none';
+  var sm = document.getElementById('settingsModal'); if (sm) sm.style.display = 'none';
+  var me = document.getElementById('modalErr'); if (me) me.style.display = 'none';
 }
 
 function saveSettings() {

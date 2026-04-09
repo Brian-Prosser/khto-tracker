@@ -1,4 +1,4 @@
-<!-- KJPX Ramp Tracker v20260409i - settings tab opens modal -->
+<!-- KJPX Ramp Tracker v20260409j - simple inline gear -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -85,7 +85,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:10p
   <div class="header-right">
     <div class="status-dot" id="statusDot"></div>
     <div class="status-text" id="statusText">NOT CONNECTED</div>
-    <button id="gearBtn" style="background:none;border:1px solid var(--border);border-radius:6px;color:var(--muted);padding:4px 10px;cursor:pointer;font-size:14px;margin-left:8px;" title="Settings">⚙</button>
+    <button onclick="document.getElementById('settingsModal').style.display='flex'" style="background:none;border:1px solid var(--border);border-radius:6px;color:var(--muted);padding:4px 10px;cursor:pointer;font-size:14px;margin-left:8px;" title="Settings">⚙</button>
   </div>
 </header>
 
@@ -118,7 +118,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:10p
 <div class="main">
   <div class="sidebar">
     <div class="sidebar-tabs">
-      <button class="tab-btn active" onclick="openSettings()">⚙ Settings</button>
+      <button class="tab-btn active" onclick="switchTab('settings')">⚙ Settings</button>
       <button class="tab-btn" onclick="switchTab('aircraft')">✈ Aircraft</button>
     </div>
     <div class="tab-content active" id="tab-settings">
@@ -553,12 +553,6 @@ function saveSettings() {
 // Close modal when clicking outside
 document.getElementById('settingsModal') && var sm = document.getElementById('settingsModal'); sm &&  sm.addEventListener('click', function(e) {
   if (e.target === this) closeSettings();
-});
-
-// Gear button event listener
-document.addEventListener('DOMContentLoaded', function() {
-  var gear = document.getElementById('gearBtn');
-  if (gear) gear.addEventListener('click', function() { openSettings(); });
 });
 
 function selectAircraft(i) {

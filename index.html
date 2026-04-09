@@ -383,8 +383,12 @@ async function loadCards() {
     var listsRes = await fetch('https://api.trello.com/1/boards/' + boardId + '/lists?key=' + key + '&token=' + token + '&fields=id,name');
     var lists = listsRes.ok ? await listsRes.json() : [];
     var doneListIds = lists
-      .filter(function(l) { return l.name.toLowerCase() === 'done' || l.name.toLowerCase() === 'complete' || l.name.toLowerCase() === 'completed' || l.name.toLowerCase() === 'departed'; })
+      .filter(function(l) {
+        var n = l.name.toLowerCase().trim();
+        return n === 'done' || n === 'complete' || n === 'completed' || n === 'departed' || n.indexOf('done') !== -1 || n.indexOf('complet') !== -1 || n.indexOf('depart') !== -1;
+      })
       .map(function(l) { return l.id; });
+    console.log('Done lists:', lists.filter(function(l){ var n=l.name.toLowerCase().trim(); return n.indexOf('done')!==-1||n.indexOf('complet')!==-1; }).map(function(l){return l.name;}));
 
     var res = await fetch('https://api.trello.com/1/boards/' + boardId + '/cards?key=' + key + '&token=' + token + '&fields=name,due,labels,idList');
     if (!res.ok) throw new Error('Failed to fetch cards: ' + res.status);

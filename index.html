@@ -94,7 +94,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:10p
         <div class="info-box">Keys are saved in your browser. <a href="https://trello.com/app-key" target="_blank">Get Trello API key →</a></div>
         <div class="field-group">
           <div class="field-label">Trello API Key</div>
-          <input class="field-input" type="text" id="trelloKey" autocomplete="off" data-1p-ignore value="91d4799692a37d718fe3af5ee4aaafad" />
+          <input class="field-input" type="text" id="trelloKey" autocomplete="off" data-1p-ignore id="trelloKey" value="" />
         </div>
         <div class="field-group">
           <div class="field-label">Trello Token</div>
@@ -151,6 +151,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:10p
 </div>
 <div class="toast" id="toast"></div>
 
+<script src="config.js"></script>
 <script>
 var RAMP_DB = {
   "J1":{"lat":40.96075,"lng":-72.24842,"color":"#ff6b35","short":"J1"},
@@ -263,12 +264,20 @@ var refreshTimer = null;
 var aircraftData = [];
 
 window.addEventListener('load', function() {
-  // Restore saved keys if available
+  // Load from config.js if available
+  if (typeof CONFIG !== 'undefined') {
+    if (CONFIG.trello.apiKey) document.getElementById('trelloKey').value = CONFIG.trello.apiKey;
+    if (CONFIG.trello.token && CONFIG.trello.token !== 'REPLACE_WITH_TOKEN')
+      document.getElementById('trelloToken').value = CONFIG.trello.token;
+    if (CONFIG.mapbox.token && CONFIG.mapbox.token !== 'REPLACE_WITH_MAPBOX_TOKEN')
+      document.getElementById('mapboxToken').value = CONFIG.mapbox.token;
+  }
+  // Fall back to localStorage
   var t = localStorage.getItem('khto_trello_token');
   var m = localStorage.getItem('khto_mapbox_token');
-  if (t) document.getElementById('trelloToken').value = t;
-  if (m) document.getElementById('mapboxToken').value = m;
-  // Auto-connect using whatever is in the fields (pre-filled or saved)
+  if (t && !document.getElementById('trelloToken').value) document.getElementById('trelloToken').value = t;
+  if (m && !document.getElementById('mapboxToken').value) document.getElementById('mapboxToken').value = m;
+  // Auto-connect
   setTimeout(function() {
     var key = document.getElementById('trelloKey').value.trim();
     var token = document.getElementById('trelloToken').value.trim();
@@ -358,6 +367,13 @@ async function connectTrello() {
     localStorage.setItem('khto_mapbox_token', mbToken);
     localStorage.setItem('khto_trello_key', key);
     hideErr();
+    var statusEl = document.getElementById('connectionStatus');
+    if (statusEl) {
+      statusEl.textContent = 'Connected to Trello · SAS Ramp Tracker · Auto-refreshing every ' + (typeof CONFIG !== 'undefined' ? CONFIG.app.refreshInterval : 30) + 's';
+      statusEl.style.background = 'rgba(34,197,94,0.1)';
+      statusEl.style.borderColor = 'rgba(34,197,94,0.3)';
+      statusEl.style.color = '#22c55e';
+    }
     initMap(mbToken);
     // Auto-load aircraft after map initializes
     setTimeout(function() { loadCards(); }, 1200);
@@ -417,7 +433,7 @@ async function loadCards() {
     document.getElementById('aircraftCount').textContent = aircraftData.length;
     switchTab('aircraft');
     clearInterval(refreshTimer);
-    var interval = parseInt(document.getElementById('refreshInterval').value) * 1000;
+    var interval = (typeof CONFIG !== "undefined" ? CONFIG.app.refreshInterval : parseInt(document.getElementById("refreshInterval").value)) * 1000;
     if (interval > 0) refreshTimer = setInterval(loadCards, interval);
     showToast('Loaded ' + aircraftData.length + ' aircraft on field', false);
   } catch(e) {

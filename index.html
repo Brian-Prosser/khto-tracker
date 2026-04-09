@@ -1,4 +1,4 @@
-<!-- KJPX Ramp Tracker v20260409j - simple inline gear -->
+<!-- KJPX Ramp Tracker v20260409k - event delegation -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -109,8 +109,8 @@ header{display:flex;align-items:center;justify-content:space-between;padding:10p
       <input class="field-input" type="text" id="modal_mapboxToken" autocomplete="off" data-1p-ignore placeholder="pk.eyJ1..." />
     </div>
     <div style="display:flex;gap:10px;">
-      <button onclick="saveSettings()" class="btn-primary" style="flex:1">SAVE & RECONNECT</button>
-      <button onclick="closeSettings()" class="btn-primary" style="flex:0 0 auto;width:auto;padding:10px 16px;background:var(--border);color:var(--text)">CANCEL</button>
+      <button id="saveBtn" class="btn-primary" style="flex:1">SAVE & RECONNECT</button>
+      <button id="cancelBtn" class="btn-primary" style="flex:0 0 auto;width:auto;padding:10px 16px;background:var(--border);color:var(--text)">CANCEL</button>
     </div>
     <div id="modalErr" style="margin-top:10px;font-size:11px;color:#ef4444;font-family:'DM Mono',monospace;display:none;"></div>
   </div>

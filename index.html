@@ -1,4 +1,4 @@
-<!-- KJPX Ramp Tracker v20260409b - J01-J10 zero-padded -->
+<!-- KJPX Ramp Tracker v20260409c - clean settings UI -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -123,33 +123,16 @@ header{display:flex;align-items:center;justify-content:space-between;padding:10p
     </div>
     <div class="tab-content active" id="tab-settings">
       <div class="settings-scroll">
-        <div class="info-box">Keys are saved in your browser. <a href="https://trello.com/app-key" target="_blank">Get Trello API key →</a></div>
-        <div class="field-group">
-          <div class="field-label">Trello API Key</div>
-          <input class="field-input" type="text" id="trelloKey" autocomplete="off" data-1p-ignore id="trelloKey" value="" />
-        </div>
-        <div class="field-group">
-          <div class="field-label">Trello Token</div>
-          <input class="field-input" type="text" id="trelloToken" autocomplete="off" data-1p-ignore placeholder="Paste your Trello token here" />
-        </div>
-        <div class="field-group">
-          <div class="field-label">Mapbox Access Token</div>
-          <input class="field-input" type="text" id="mapboxToken" autocomplete="off" data-1p-ignore placeholder="pk.eyJ1..." />
-        </div>
-        <button class="btn-primary" id="connectBtn" onclick="connectTrello()">CONNECT TO TRELLO</button>
+        <!-- Hidden fields populated from config.js or localStorage -->
+        <input type="hidden" id="trelloKey" />
+        <input type="hidden" id="trelloToken" />
+        <input type="hidden" id="mapboxToken" />
+        <input type="hidden" id="refreshInterval" value="30" />
+        <select style="display:none" id="boardSelect"></select>
+        <button style="display:none" id="connectBtn" onclick="connectTrello()">CONNECT</button>
+        <button style="display:none" id="loadBtn" onclick="loadCards()">LOAD</button>
         <div class="err-box" id="errBox"></div>
-        <hr class="divider" />
-        <div id="boardSection" style="display:none">
-          <div class="field-group">
-            <div class="field-label">Select Board</div>
-            <select class="field-select" id="boardSelect"></select>
-          </div>
-          <div class="field-group">
-            <div class="field-label">Auto-refresh (seconds, 0=off)</div>
-            <input class="field-input" type="number" id="refreshInterval" value="30" min="0" />
-          </div>
-          <button class="btn-primary" style="background:var(--accent2)" id="loadBtn" onclick="loadCards()">LOAD AIRCRAFT</button>
-        </div>
+        <div class="info-box" id="connectionStatus" style="color:var(--muted)">Connecting to Trello...</div>
         <hr class="divider" />
         <div class="legend">
           <div class="legend-title">Ramp Types</div>

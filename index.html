@@ -1,4 +1,4 @@
-<!-- KJPX Ramp Tracker v20260409k - event delegation -->
+<!-- KJPX Ramp Tracker v20260409m - cancel fixed -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -94,7 +94,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:10p
   <div style="background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:24px;width:380px;max-width:90vw;">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
       <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:var(--accent)">CONNECTION SETTINGS</div>
-      <button onclick="closeSettings()" style="background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;">✕</button>
+      <button onclick="closeSettings()" style="background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;z-index:1001;">✕</button>
     </div>
     <div style="margin-bottom:14px;">
       <div class="field-label">Trello API Key</div>
@@ -110,7 +110,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:10p
     </div>
     <div style="display:flex;gap:10px;">
       <button id="saveBtn" class="btn-primary" style="flex:1">SAVE & RECONNECT</button>
-      <button id="cancelBtn" class="btn-primary" style="flex:0 0 auto;width:auto;padding:10px 16px;background:var(--border);color:var(--text)">CANCEL</button>
+      <button onclick="closeSettings()" class="btn-primary" style="flex:0 0 auto;width:auto;padding:10px 16px;background:var(--border);color:var(--text)">CANCEL</button>
     </div>
     <div id="modalErr" style="margin-top:10px;font-size:11px;color:#ef4444;font-family:'DM Mono',monospace;display:none;"></div>
   </div>
@@ -551,9 +551,7 @@ function saveSettings() {
 }
 
 // Close modal when clicking outside
-document.getElementById('settingsModal') && var sm = document.getElementById('settingsModal'); sm &&  sm.addEventListener('click', function(e) {
-  if (e.target === this) closeSettings();
-});
+document.getElementById('settingsModal') && 
 
 function selectAircraft(i) {
   document.querySelectorAll('.aircraft-item').forEach(function(el) { el.classList.remove('selected'); });

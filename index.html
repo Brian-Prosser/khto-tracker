@@ -329,6 +329,7 @@
         </div>
 
         <button class="btn-primary" id="connectBtn" onclick="connectTrello()">CONNECT TO TRELLO</button>
+        <div id="connectError" style="display:none;margin-top:10px;padding:10px;border-radius:6px;font-family:'DM Mono',monospace;font-size:11px;line-height:1.5;word-break:break-all;"></div>
 
         <hr class="divider" />
 
@@ -522,15 +523,35 @@ async function connectTrello() {
   const token = document.getElementById('trelloToken').value.trim();
   const mbToken = document.getElementById('mapboxToken').value.trim();
 
-  if (!key || !token) return showToast('Please enter your Trello API key and token.');
-  if (!mbToken)       return showToast('Please enter your Mapbox access token.');
+  const errDiv = document.getElementById('connectError');
+  errDiv.style.display = 'none';
+
+  if (!key || !token) {
+    errDiv.textContent = 'ERROR: Please enter your Trello API key and token.';
+    errDiv.style.display = 'block';
+    return;
+  }
+  if (!mbToken) {
+    errDiv.textContent = 'ERROR: Please enter your Mapbox access token.';
+    errDiv.style.display = 'block';
+    return;
+  }
 
   const btn = document.getElementById('connectBtn');
   btn.disabled = true; btn.textContent = 'CONNECTING...';
 
   try {
-    const res = await fetch(`https://api.trello.com/1/members/me/boards?key=${key}&token=${token}&fields=id,name`);
-    if (!res.ok) throw new Error('Invalid Trello credentials — check your key and token.');
+    const url = `https://api.trello.com/1/members/me/boards?key=${key}&token=${token}&fields=id,name`;
+    errDiv.textContent = 'Fetching: ' + url.substring(0, 60) + '...';
+    errDiv.style.display = 'block';
+    errDiv.style.background = 'rgba(0,217,255,0.1)';
+    errDiv.style.color = '#00d9ff';
+
+    const res = await fetch(url);
+    if (!res.ok) {
+      const txt = await res.text();
+      throw new Error(`Trello error ${res.status}: ${txt.substring(0,100)}`);
+    }
     const boards = await res.json();
 
     const sel = document.getElementById('boardSelect');
@@ -540,11 +561,15 @@ async function connectTrello() {
     document.getElementById('statusDot').classList.add('live');
     document.getElementById('statusText').textContent = 'CONNECTED';
 
+    errDiv.style.display = 'none';
     saveKeys();
     initMap(mbToken);
     showToast('Connected to Trello!', false);
   } catch(e) {
-    showToast(e.message || 'Failed to connect to Trello');
+    errDiv.textContent = 'ERROR: ' + (e.message || 'Failed to connect to Trello');
+    errDiv.style.display = 'block';
+    errDiv.style.background = 'rgba(239,68,68,0.15)';
+    errDiv.style.color = '#ef4444';
   }
 
   btn.disabled = false; btn.textContent = 'CONNECT TO TRELLO';

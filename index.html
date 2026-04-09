@@ -303,8 +303,8 @@ function initMap(token) {
   map = new mapboxgl.Map({
     container: 'map',
     style: 'mapbox://styles/mapbox/satellite-streets-v12',
-    center: [-72.2510, 40.9605],
-    zoom: 15.2,
+    center: [-72.2508, 40.9603],
+    zoom: 16.2,
     pitch: 0
   });
   map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
@@ -336,8 +336,13 @@ async function connectTrello() {
     var boards = await res.json();
     var sel = document.getElementById('boardSelect');
     sel.innerHTML = boards.map(function(b) { return '<option value="' + b.id + '">' + b.name + '</option>'; }).join('');
-    var savedBoard = localStorage.getItem('khto_board_id');
-    if (savedBoard) { sel.value = savedBoard; }
+    // Auto-select SAS Ramp Tracker, fall back to saved board
+    var sasOption = Array.from(sel.options).find(function(o) { return o.text.toLowerCase().includes('sas ramp'); });
+    if (sasOption) { sel.value = sasOption.value; }
+    else {
+      var savedBoard = localStorage.getItem('khto_board_id');
+      if (savedBoard) sel.value = savedBoard;
+    }
     document.getElementById('boardSection').style.display = 'block';
     document.getElementById('statusDot').classList.add('live');
     document.getElementById('statusText').textContent = 'CONNECTED';

@@ -379,12 +379,22 @@ async function loadCards() {
   if (loadBtn) { loadBtn.disabled = true; loadBtn.textContent = 'LOADING...'; }
 
   try {
-    var res = await fetch('https://api.trello.com/1/boards/' + boardId + '/cards?key=' + key + '&token=' + token + '&fields=name,due,labels');
+    // Fetch lists so we can filter out Done
+    var listsRes = await fetch('https://api.trello.com/1/boards/' + boardId + '/lists?key=' + key + '&token=' + token + '&fields=id,name');
+    var lists = listsRes.ok ? await listsRes.json() : [];
+    var doneListIds = lists
+      .filter(function(l) { return l.name.toLowerCase() === 'done' || l.name.toLowerCase() === 'complete' || l.name.toLowerCase() === 'completed' || l.name.toLowerCase() === 'departed'; })
+      .map(function(l) { return l.id; });
+
+    var res = await fetch('https://api.trello.com/1/boards/' + boardId + '/cards?key=' + key + '&token=' + token + '&fields=name,due,labels,idList');
     if (!res.ok) throw new Error('Failed to fetch cards: ' + res.status);
     var cards = await res.json();
     aircraftData = [];
 
     cards.forEach(function(card) {
+      // Skip cards in Done/Completed/Departed lists
+      if (doneListIds.indexOf(card.idList) !== -1) return;
+
       var rampData = null;
       var rampPosition = null;
       if (card.labels && card.labels.length > 0) {
